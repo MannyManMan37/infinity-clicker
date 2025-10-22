@@ -163,6 +163,15 @@
     <button class="close-btn" onclick="closeCredits()">Close</button>
 </div>
 
+<div id="patchBox" class="credits-box">
+    <div class="credits-content">
+
+        <p>New 2.00 UPD<br>
+        New Premium Shop</p>
+    <button class="close-btn" onclick="closeCredits()">Close</button>
+</div>
+
+
 <div id="achievementPopup"></div>
 
 <script>
@@ -276,6 +285,9 @@ function checkAchievements(){ if(x>=1000) showAchievementOnce("1000 Clicks!"); i
 function showCredits(){ document.getElementById("overlay").style.display="block"; document.getElementById("creditsBox").style.display="block"; }
 function closeCredits(){ document.getElementById("overlay").style.display="none"; document.getElementById("creditsBox").style.display="none"; }
 
+// Patch
+function patch(){ document.getElementById("overlay").style.display="block"; document.getElementById("creditsBox").style.display="block"; }
+
 // Update display and save
 function updateDisplay(){ document.getElementById("idk").innerText="Clicks: "+x; document.getElementById("rebirthCounter").innerText="Rebirths: "+rebirths; document.getElementById("prestigePoints").innerText="Prestige Points: "+prestigePoints; }
 function saveData(){ localStorage.setItem("x",x); localStorage.setItem("clickPower",clickPower); localStorage.setItem("rebirths",rebirths); localStorage.setItem("rebirthMultiplier",rebirthMultiplier); localStorage.setItem("autoClickers",autoClickers); localStorage.setItem("critChance",critChance); localStorage.setItem("prestigePoints",prestigePoints); localStorage.setItem("lastDaily",lastDaily); localStorage.setItem("achievements",JSON.stringify(unlockedAchievements)); }
@@ -286,6 +298,7 @@ renderShop(); updateDisplay(); checkAchievements();
 
 </body>
 </html>
+
 
 
 
