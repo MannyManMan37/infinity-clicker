@@ -160,7 +160,7 @@
         <img src="rxl.jpg" alt="RXL">
         <div class="credits-text"><h3>RXL</h3><p>Game Tester</p></div>
     </div>
-    <button class="close-btn" onclick="closeCredits()">Close</button>
+    <button class="close-btn" onclick="closepatch()">Close</button>
 </div>
 
 <div id="patchBox" class="credits-box">
@@ -287,6 +287,7 @@ function closeCredits(){ document.getElementById("overlay").style.display="none"
 
 // Patch
 function patch(){ document.getElementById("overlay").style.display="block"; document.getElementById("patchBox").style.display="block"; }
+function closeCredits(){ document.getElementById("overlay").style.display="none"; document.getElementById("creditsBox").style.display="none"; }{ document.getElementById("overlay").style.display="none"; document.getElementById("patchBox").style.display="none"; }
 
 // Update display and save
 function updateDisplay(){ document.getElementById("idk").innerText="Clicks: "+x; document.getElementById("rebirthCounter").innerText="Rebirths: "+rebirths; document.getElementById("prestigePoints").innerText="Prestige Points: "+prestigePoints; }
@@ -298,6 +299,7 @@ renderShop(); updateDisplay(); checkAchievements();
 
 </body>
 </html>
+
 
 
 
