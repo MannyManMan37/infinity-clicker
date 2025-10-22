@@ -139,7 +139,7 @@
     <button onclick="clickHandler()" class="hand">Click</button>
     <button onclick="rebirth()" class="rebirth-btn">Rebirth</button>
     <button onclick="showCredits()" class="credits-btn">Credits</button>
-    <button class="patch-btn" onclick="patch()">Patch Notes</button>
+    <button class="patch-btn" onclick="cya()">Patch Notes</button>
     <button onclick="claimDaily()" class="daily-btn">Claim Daily Reward</button>
     <div id="dailyTimer">Next daily in: 24:00:00</div>
 </div>
@@ -242,7 +242,11 @@ function renderShop(){
         shopDiv.appendChild(pBtn3);
     }
 }
-
+//Maintnence
+    function cya() {
+        alert("Under Maintenance")
+    }
+    
 // Click handler
 function clickHandler(){
     let gain = clickPower*rebirthMultiplier;
@@ -299,6 +303,7 @@ renderShop(); updateDisplay(); checkAchievements();
 
 </body>
 </html>
+
 
 
 
