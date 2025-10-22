@@ -48,6 +48,7 @@
         .rebirth-btn { background: crimson; color:white; cursor:pointer; }
         .credits-btn { background: darkgreen; color:white; cursor:pointer; }
         .daily-btn { background: orange; color:black; cursor:pointer; }
+        .patch-btn { background: purple; color:white; cursor:pointer; }
 
         .shop { 
             flex:1; 
@@ -140,6 +141,7 @@
     <button onclick="claimDaily()" class="daily-btn">Claim Daily Reward</button>
     <div id="dailyTimer">Next daily in: 24:00:00</div>
     <button onclick="showCredits()" class="credits-btn">Credits</button>
+    <button class="patch-btn" onclick="patch()">Patch Notes</button>
 </div>
 
 <div class="shop">
@@ -284,4 +286,5 @@ renderShop(); updateDisplay(); checkAchievements();
 
 </body>
 </html>
+
 
