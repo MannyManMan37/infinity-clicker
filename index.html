@@ -48,7 +48,17 @@
         .rebirth-btn { background: crimson; color:white; cursor:pointer; }
         .credits-btn { background: darkgreen; color:white; cursor:pointer; }
         .daily-btn { background: orange; color:black; cursor:pointer; }
-        .patch-btn { background: purple; color:white; cursor:pointer; }
+        .patch-btn { background: purple; color:white; cursor:pointer; 
+            width: 280px; 
+            min-width: 200px;
+            background: rgba(0,0,0,0.85); 
+            padding: 15px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 10px; 
+            border-right: 2px solid gold; 
+            height: 100vh;
+            box-sizing: border-box;}
 
         .shop { 
             flex:1; 
@@ -286,5 +296,6 @@ renderShop(); updateDisplay(); checkAchievements();
 
 </body>
 </html>
+
 
 
