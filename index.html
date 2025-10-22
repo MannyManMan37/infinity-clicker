@@ -135,7 +135,7 @@
     <h1>Infinity Clicker</h1>
     <p id="idk">Clicks: 0</p>
     <p id="rebirthCounter">Rebirths: 0</p>
-    <p id="prestigePoints">Prestige Points: 0</p>
+    <p id="prestigePoints">Premium Coins: 0</p>
     <button onclick="clickHandler()" class="hand">Click</button>
     <button onclick="rebirth()" class="rebirth-btn">Rebirth</button>
     <button onclick="showCredits()" class="credits-btn">Credits</button>
@@ -230,15 +230,15 @@ function renderShop(){
     shopDiv.appendChild(critBtn);
 
     if(rebirths>0){
-        const prestigeHeader = document.createElement("h3"); prestigeHeader.innerText="Prestige Shop"; shopDiv.appendChild(prestigeHeader);
+        const prestigeHeader = document.createElement("h3"); prestigeHeader.innerText="Premium Shop"; shopDiv.appendChild(prestigeHeader);
         const pBtn1 = document.createElement("div"); pBtn1.className="shop-item"; pBtn1.innerText="+5 Click Power Permanently (1 PP)";
-        pBtn1.onclick = ()=>{ if(prestigePoints>=1){ clickPower+=5; prestigePoints--; saveData(); updateDisplay(); showAchievementOnce("Prestige Click Power Bought!"); } else alert("Not enough Prestige Points!"); };
+        pBtn1.onclick = ()=>{ if(prestigePoints>=1){ clickPower+=5; prestigePoints--; saveData(); updateDisplay(); showAchievementOnce("Premium Click Power Bought!"); } else alert("Not enough Premium Coins!"); };
         shopDiv.appendChild(pBtn1);
         const pBtn2 = document.createElement("div"); pBtn2.className="shop-item"; pBtn2.innerText="+1% Critical Chance (1 PP)";
-        pBtn2.onclick = ()=>{ if(prestigePoints>=1){ critChance+=0.01; prestigePoints--; saveData(); updateDisplay(); showAchievementOnce("Prestige Crit Upgrade Bought!"); } else alert("Not enough Prestige Points!"); };
+        pBtn2.onclick = ()=>{ if(prestigePoints>=1){ critChance+=0.01; prestigePoints--; saveData(); updateDisplay(); showAchievementOnce("Premium Crit Upgrade Bought!"); } else alert("Not enough Premium Coins!"); };
         shopDiv.appendChild(pBtn2);
         const pBtn3 = document.createElement("div"); pBtn3.className="shop-item"; pBtn3.innerText="Auto Clicker +1 Multiplier (1 PP)";
-        pBtn3.onclick = ()=>{ if(prestigePoints>=1){ autoClickers++; prestigePoints--; saveData(); updateDisplay(); showAchievementOnce("Prestige Auto Clicker Bought!"); } else alert("Not enough Prestige Points!"); };
+        pBtn3.onclick = ()=>{ if(prestigePoints>=1){ autoClickers++; prestigePoints--; saveData(); updateDisplay(); showAchievementOnce("Premium Auto Clicker Bought!"); } else alert("Not enough Premium Coins!"); };
         shopDiv.appendChild(pBtn3);
     }
 }
@@ -298,6 +298,7 @@ renderShop(); updateDisplay(); checkAchievements();
 
 </body>
 </html>
+
 
 
 
