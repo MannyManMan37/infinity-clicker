@@ -43,7 +43,7 @@
             background: rgba(0,0,0,0.5); 
             border: 2px solid gold; 
         }
-        .hand { background: linear-gradient(135deg,#6a11cb,#2575fc); cursor:pointer; }
+        .hand { background: linear-gradient(135deg,#6a11cb,#2575fc); cursor:pointer; transition: 0.2s; }
         .hand:hover { transform: scale(1.05); }
         .rebirth-btn { background: crimson; color:white; cursor:pointer; }
         .credits-btn { background: darkgreen; color:white; cursor:pointer; }
@@ -57,7 +57,7 @@
             flex-direction:column; 
             gap:10px; 
             overflow-y:auto; 
-            max-height: 100vh; /* ensure shop scrolls independently */
+            max-height: 100vh;
         }
         .shop-item { 
             background: rgba(0,0,0,0.6); 
@@ -111,6 +111,7 @@
             box-shadow: 0 0 10px black;
             font-weight: bold;
             z-index: 2000;
+            transition: opacity 0.3s ease;
         }
 
         #dailyTimer {
@@ -120,7 +121,6 @@
             margin-top: -10px;
         }
 
-        /* Mobile adjustments */
         @media (max-width: 600px) {
             body { flex-direction: column; height: auto; }
             .sidebar { width: 100%; border-right: none; border-bottom: 2px solid gold; height: auto; }
@@ -148,8 +148,9 @@
     <h2>Shop</h2>
 </div>
 
-<div id="overlay" onclick="closeCredits()"></div>
+<div id="overlay" onclick="closeAllModals()"></div>
 
+<!-- Credits -->
 <div id="creditsBox" class="credits-box">
     <div class="credits-content">
         <img src="quantum.jpg" alt="Quantum">
@@ -160,18 +161,17 @@
         <img src="rxl.jpg" alt="RXL">
         <div class="credits-text"><h3>RXL</h3><p>Game Tester</p></div>
     </div>
-    <button class="close-btn" onclick="closepatch()">Close</button>
+    <button class="close-btn" onclick="closeAllModals()">Close</button>
 </div>
 
+<!-- Patch Notes -->
 <div id="patchBox" class="credits-box">
-    <div class="credits-content">
-
-        <p>New 2.00 UPD<br>
-        New Premium Shop</p>
-    <button class="close-btn" onclick="closeCredits()">Close</button>
+    <h2>Patch Notes</h2>
+    <div id="patchContent"></div>
+    <button class="close-btn" onclick="closeAllModals()">Close</button>
 </div>
 
-
+<!-- Achievement popup -->
 <div id="achievementPopup"></div>
 
 <script>
@@ -184,6 +184,28 @@ let critChance = parseFloat(localStorage.getItem("critChance")) || 0;
 let prestigePoints = parseInt(localStorage.getItem("prestigePoints")) || 0;
 let lastDaily = parseInt(localStorage.getItem("lastDaily")) || 0;
 let unlockedAchievements = JSON.parse(localStorage.getItem("achievements")) || [];
+
+// Patch Notes Data
+const patchNotes = [
+    {
+        version: "2.00",
+        date: "October 2025",
+        changes: [
+            "Added Premium Shop",
+            "Improved achievement system",
+            "Fixed rebirth popup",
+            "Visual polish and mobile improvements"
+        ]
+    },
+    {
+        version: "1.9",
+        date: "September 2025",
+        changes: [
+            "Added Daily Reward system",
+            "New background and UI colors"
+        ]
+    }
+];
 
 // Auto click loop
 setInterval(() => {
@@ -205,8 +227,14 @@ function renderShop(){
         let cost = Math.floor(power*10);
         btn.innerText = `Button ${index+1}: +${power} per click (Cost: ${cost})`;
         btn.onclick = ()=>{
-            if(x>=cost){ x-=cost; clickPower+=power; saveData(); updateDisplay(); showAchievementOnce(`Bought Button ${index+1}`); }
-            else alert("Not enough clicks!");
+            if(x>=cost){ 
+                x-=cost; 
+                clickPower+=power; 
+                saveData(); 
+                updateDisplay(); 
+                showAchievementOnce(`Bought Button ${index+1}`); 
+            }
+            else showAchievement("Not enough clicks!");
         };
         shopDiv.appendChild(btn);
     });
@@ -216,7 +244,7 @@ function renderShop(){
     autoBtn.innerText = `Auto Clicker (+1 click/sec) Cost: 500`;
     autoBtn.onclick = ()=>{
         if(x>=500){ x-=500; autoClickers++; saveData(); updateDisplay(); showAchievementOnce("Auto Clicker Purchased!"); }
-        else alert("Not enough clicks!");
+        else showAchievement("Not enough clicks!");
     };
     shopDiv.appendChild(autoBtn);
 
@@ -225,28 +253,38 @@ function renderShop(){
     critBtn.innerText = `Critical Click (+5% chance for 3x) Cost: 1000`;
     critBtn.onclick = ()=>{
         if(x>=1000){ x-=1000; critChance+=0.05; if(critChance>1) critChance=1; saveData(); updateDisplay(); showAchievementOnce("Critical Click Upgrade Purchased!"); }
-        else alert("Not enough clicks!");
+        else showAchievement("Not enough clicks!");
     };
     shopDiv.appendChild(critBtn);
 
     if(rebirths>0){
         const prestigeHeader = document.createElement("h3"); prestigeHeader.innerText="Premium Shop"; shopDiv.appendChild(prestigeHeader);
         const pBtn1 = document.createElement("div"); pBtn1.className="shop-item"; pBtn1.innerText="+5 Click Power Permanently (1 PP)";
-        pBtn1.onclick = ()=>{ if(prestigePoints>=1){ clickPower+=5; prestigePoints--; saveData(); updateDisplay(); showAchievementOnce("Premium Click Power Bought!"); } else alert("Not enough Premium Coins!"); };
+        pBtn1.onclick = ()=>{ if(prestigePoints>=1){ clickPower+=5; prestigePoints--; saveData(); updateDisplay(); showAchievementOnce("Premium Click Power Bought!"); } else showAchievement("Not enough Premium Coins!"); };
         shopDiv.appendChild(pBtn1);
         const pBtn2 = document.createElement("div"); pBtn2.className="shop-item"; pBtn2.innerText="+1% Critical Chance (1 PP)";
-        pBtn2.onclick = ()=>{ if(prestigePoints>=1){ critChance+=0.01; prestigePoints--; saveData(); updateDisplay(); showAchievementOnce("Premium Crit Upgrade Bought!"); } else alert("Not enough Premium Coins!"); };
+        pBtn2.onclick = ()=>{ if(prestigePoints>=1){ critChance+=0.01; prestigePoints--; saveData(); updateDisplay(); showAchievementOnce("Premium Crit Upgrade Bought!"); } else showAchievement("Not enough Premium Coins!"); };
         shopDiv.appendChild(pBtn2);
         const pBtn3 = document.createElement("div"); pBtn3.className="shop-item"; pBtn3.innerText="Auto Clicker +1 Multiplier (1 PP)";
-        pBtn3.onclick = ()=>{ if(prestigePoints>=1){ autoClickers++; prestigePoints--; saveData(); updateDisplay(); showAchievementOnce("Premium Auto Clicker Bought!"); } else alert("Not enough Premium Coins!"); };
+        pBtn3.onclick = ()=>{ if(prestigePoints>=1){ autoClickers++; prestigePoints--; saveData(); updateDisplay(); showAchievementOnce("Premium Auto Clicker Bought!"); } else showAchievement("Not enough Premium Coins!"); };
         shopDiv.appendChild(pBtn3);
     }
 }
-//Maintnence
-    function cya() {
-        alert("Under Maintenance")
-    }
-    
+
+// ✅ Patch Notes handler
+function cya(){ patch(); }
+function patch(){
+    const patchContent = document.getElementById("patchContent");
+    patchContent.innerHTML = "";
+    patchNotes.forEach(note => {
+        const div = document.createElement("div");
+        div.innerHTML = `<h3>Version ${note.version} - ${note.date}</h3><ul>${note.changes.map(c=>`<li>${c}</li>`).join("")}</ul><hr>`;
+        patchContent.appendChild(div);
+    });
+    document.getElementById("overlay").style.display="block";
+    document.getElementById("patchBox").style.display="block";
+}
+
 // Click handler
 function clickHandler(){
     let gain = clickPower*rebirthMultiplier;
@@ -254,10 +292,18 @@ function clickHandler(){
     x+=gain; saveData(); updateDisplay(); checkAchievements();
 }
 
-// Rebirth
+// ✅ Rebirth with achievement popup
 function rebirth(){
-    if(x>=1000){ rebirths++; prestigePoints++; rebirthMultiplier=1+Math.floor(rebirths*0.5); x=0; clickPower=1; autoClickers=0; critChance=0; saveData(); updateDisplay(); showAchievementOnce("Rebirth Achieved!"); renderShop(); }
-    else alert("Need at least 1000 clicks to rebirth!");
+    if(x>=1000){ 
+        rebirths++; 
+        prestigePoints++; 
+        rebirthMultiplier=1+Math.floor(rebirths*0.5); 
+        x=0; clickPower=1; autoClickers=0; critChance=0; 
+        saveData(); updateDisplay(); showAchievementOnce("Rebirth Achieved!"); 
+        renderShop(); 
+    } else {
+        showAchievement("Need 1000 clicks to Rebirth!", 4000);
+    }
 }
 
 // Daily reward
@@ -265,7 +311,7 @@ function claimDaily(){
     const now = Date.now();
     if(now - lastDaily >= 24*60*60*1000){
         const reward = 500 + rebirths*100; x+=reward; lastDaily=now; saveData(); updateDisplay(); showAchievementOnce(`Claimed Daily Reward: +${reward}`);
-    } else alert("Daily reward already claimed!");
+    } else showAchievement("Daily reward already claimed!");
 }
 
 // Daily countdown
@@ -281,36 +327,44 @@ setInterval(updateDailyTimer, 1000);
 updateDailyTimer();
 
 // Achievements
-function showAchievement(msg){ const popup = document.getElementById("achievementPopup"); popup.innerText=msg; popup.style.display="block"; setTimeout(()=>{popup.style.display="none";},2500); }
+function showAchievement(msg, duration = 2500){ 
+    const popup = document.getElementById("achievementPopup"); 
+    popup.innerText=msg; 
+    popup.style.display="block"; 
+    popup.style.opacity="1";
+    setTimeout(()=>{popup.style.opacity="0";},duration-300);
+    setTimeout(()=>{popup.style.display="none";},duration);
+}
 function showAchievementOnce(name){ if(!unlockedAchievements.includes(name)){ unlockedAchievements.push(name); saveData(); showAchievement(name); } }
 function checkAchievements(){ if(x>=1000) showAchievementOnce("1000 Clicks!"); if(x>=10000) showAchievementOnce("10,000 Clicks!"); if(rebirths>=1) showAchievementOnce("First Rebirth!"); }
 
-// Credits modal
+// Modals
 function showCredits(){ document.getElementById("overlay").style.display="block"; document.getElementById("creditsBox").style.display="block"; }
-function closeCredits(){ document.getElementById("overlay").style.display="none"; document.getElementById("creditsBox").style.display="none"; }
-
-// Patch
-function patch(){ document.getElementById("overlay").style.display="block"; document.getElementById("patchBox").style.display="block"; }
-
+function closeAllModals(){ document.getElementById("overlay").style.display="none"; document.getElementById("creditsBox").style.display="none"; document.getElementById("patchBox").style.display="none"; }
 
 // Update display and save
-function updateDisplay(){ document.getElementById("idk").innerText="Clicks: "+x; document.getElementById("rebirthCounter").innerText="Rebirths: "+rebirths; document.getElementById("prestigePoints").innerText="Prestige Points: "+prestigePoints; }
-function saveData(){ localStorage.setItem("x",x); localStorage.setItem("clickPower",clickPower); localStorage.setItem("rebirths",rebirths); localStorage.setItem("rebirthMultiplier",rebirthMultiplier); localStorage.setItem("autoClickers",autoClickers); localStorage.setItem("critChance",critChance); localStorage.setItem("prestigePoints",prestigePoints); localStorage.setItem("lastDaily",lastDaily); localStorage.setItem("achievements",JSON.stringify(unlockedAchievements)); }
+function updateDisplay(){ 
+    document.getElementById("idk").innerText="Clicks: "+x; 
+    document.getElementById("rebirthCounter").innerText="Rebirths: "+rebirths; 
+    document.getElementById("prestigePoints").innerText="Premium Coins: "+prestigePoints; 
+}
+function saveData(){ 
+    localStorage.setItem("x",x); 
+    localStorage.setItem("clickPower",clickPower); 
+    localStorage.setItem("rebirths",rebirths); 
+    localStorage.setItem("rebirthMultiplier",rebirthMultiplier); 
+    localStorage.setItem("autoClickers",autoClickers); 
+    localStorage.setItem("critChance",critChance); 
+    localStorage.setItem("prestigePoints",prestigePoints); 
+    localStorage.setItem("lastDaily",lastDaily); 
+    localStorage.setItem("achievements",JSON.stringify(unlockedAchievements)); 
+}
 
 // Initialize
-renderShop(); updateDisplay(); checkAchievements();
+renderShop(); 
+updateDisplay(); 
+checkAchievements();
 </script>
 
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
