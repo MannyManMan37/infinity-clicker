@@ -240,7 +240,6 @@
 <div id="achievementPopup"></div>
 
 <script>
-// === VARIABLES ===
 let x = Number(localStorage.getItem("x")) || 0;
 let clickPower = Number(localStorage.getItem("clickPower")) || 1;
 let rebirths = Number(localStorage.getItem("rebirths")) || 0;
@@ -254,12 +253,12 @@ let totalClicks = Number(localStorage.getItem("totalClicks")) || 0;
 let critsTriggered = Number(localStorage.getItem("critsTriggered")) || 0;
 let startTime = Number(localStorage.getItem("startTime")) || Date.now();
 
-// Sidebar button colors
+// Sidebar colors
 const sidebarButtons = document.querySelectorAll(".sidebar button");
 const buttonColors = ["#6a11cb","#dc143c","#006400","#800080","#ff8c00","#1e90ff","#ffd700","#ff69b4"];
 sidebarButtons.forEach((btn,i)=>{ btn.style.backgroundColor=buttonColors[i % buttonColors.length]; });
 
-// === ACHIEVEMENTS ===
+// Achievements
 function showAchievement(msg){
     const popup=document.getElementById("achievementPopup");
     const div=document.createElement("div");
@@ -269,40 +268,41 @@ function showAchievement(msg){
 }
 function showAchievementOnce(name){ if(!unlockedAchievements.includes(name)){ unlockedAchievements.push(name); saveData(); showAchievement(name); } }
 
-// === CLICK HANDLER ===
+// Click Handler
 let comboCount=0, comboMultiplier=1, comboTimer=null;
 function clickHandler(){
     let gain=clickPower*rebirthMultiplier*comboMultiplier;
     if(Math.random()<critChance){ gain*=3; critsTriggered++; showAchievement("Critical Click! +" + Math.floor(gain)); }
     x+=gain; totalClicks+=gain; saveData(); updateDisplay(); checkAchievements();
-
     comboCount++; comboMultiplier = 1 + Math.floor(comboCount/10)*2;
-    clearTimeout(comboTimer);
-    comboTimer=setTimeout(()=>{ comboCount=0; comboMultiplier=1; },2000);
+    clearTimeout(comboTimer); comboTimer=setTimeout(()=>{ comboCount=0; comboMultiplier=1; },2000);
     if(comboCount>0 && comboCount%10===0){ showAchievement(`Click combo x${comboCount}! +${comboMultiplier}x multiplier for 5s`); }
 }
 
-// === REBIRTH ===
-function rebirth(){ if(x>=1000){ rebirths++; prestigePoints++; rebirthMultiplier=1+Math.floor(rebirths*0.5); x=0; clickPower=1; autoClickers=0; critChance=0; saveData(); updateDisplay(); showAchievementOnce("Rebirth Achieved!"); renderShop(); } else showAchievement("Need at least 1000 clicks to rebirth!"); }
+// Rebirth
+function rebirth(){ 
+    if(x>=1000){ 
+        rebirths++; prestigePoints++; rebirthMultiplier=1+Math.floor(rebirths*0.5); x=0; clickPower=1; autoClickers=0; critChance=0; 
+        saveData(); updateDisplay(); showAchievementOnce("Rebirth Achieved!"); renderShop(); 
+    } else showAchievement("Need at least 1000 clicks to rebirth!"); 
+}
 
-// === DAILY REWARD ===
+// Daily
 function claimDaily(){ const now=Date.now(); if(now-lastDaily>=24*60*60*1000){ const reward=500+rebirths*100; x+=reward; lastDaily=now; saveData(); updateDisplay(); showAchievement(`Claimed Daily Reward: +${reward}`); } else showAchievement("Daily reward already claimed!"); }
 
-// === PATCH ===
+// Modals
 function showPatch(){ document.getElementById("overlay").style.display="block"; document.getElementById("patchBox").style.display="block"; }
-
-// === MODALS ===
 function showCredits(){ document.getElementById("overlay").style.display="block"; document.getElementById("creditsBox").style.display="block"; }
 function showQuests(){ document.getElementById("overlay").style.display="block"; document.getElementById("questsBox").style.display="block"; const q=document.getElementById("questsContent"); q.innerHTML=`<p>Daily Quests:</p><ul><li>Get 5000 clicks</li><li>Buy 3 Auto Clickers</li><li>Rebirth twice</li></ul>`; }
 function showAchievementsMenu(){ document.getElementById("overlay").style.display="block"; document.getElementById("achievementsBox").style.display="block"; const c=document.getElementById("achievementsContent"); c.innerHTML=""; unlockedAchievements.forEach(a=>{ const div=document.createElement("div"); div.innerText=a; c.appendChild(div); }); }
 function showStats(){ document.getElementById("overlay").style.display="block"; document.getElementById("statsBox").style.display="block"; const c=document.getElementById("statsContent"); c.innerHTML=`Total Clicks: ${totalClicks}<br>Rebirths: ${rebirths}<br>Crits: ${critsTriggered}<br>Time Played: ${Math.floor((Date.now()-startTime)/1000)}s`; }
 function closeAllModals(){ document.getElementById("overlay").style.display="none"; document.querySelectorAll(".credits-box").forEach(el=>el.style.display="none"); }
 
-// === DISPLAY ===
+// Display
 function updateDisplay(){ document.getElementById("idk").innerText="Clicks: "+Math.floor(x); document.getElementById("rebirthCounter").innerText="Rebirths: "+rebirths; document.getElementById("prestigePoints").innerText="Premium Coins: "+prestigePoints; }
 
-// === SHOP ===
-const buttonPowers=[1,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100,110,120,130,140,150,160,170,180,190,200,220,240,260,280,300,320,340,360,380,400,450,500,550,600,650,700,750,800,850];
+// Shop
+const buttonPowers=[1,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100];
 const shopDiv=document.querySelector(".shop");
 function renderShop(){
     shopDiv.innerHTML="<h2>Shop</h2>";
@@ -314,13 +314,11 @@ function renderShop(){
         shopDiv.appendChild(btn);
     });
 
-    const autoBtn=document.createElement("div"); autoBtn.className="shop-item";
-    autoBtn.innerText=`Auto Clicker (+1 click/sec) Cost: 500`;
+    const autoBtn=document.createElement("div"); autoBtn.className="shop-item"; autoBtn.innerText=`Auto Clicker (+1 click/sec) Cost: 500`;
     autoBtn.onclick=()=>{ if(x>=500){ x-=500; autoClickers++; saveData(); updateDisplay(); showAchievementOnce("Auto Clicker Purchased!"); } else showAchievement("Not enough clicks!"); };
     shopDiv.appendChild(autoBtn);
 
-    const critBtn=document.createElement("div"); critBtn.className="shop-item";
-    critBtn.innerText=`Critical Click (+5% chance for 3x) Cost: 1000`;
+    const critBtn=document.createElement("div"); critBtn.className="shop-item"; critBtn.innerText=`Critical Click (+5% chance for 3x) Cost: 1000`;
     critBtn.onclick=()=>{ if(x>=1000){ x-=1000; critChance+=0.05; if(critChance>1) critChance=1; saveData(); updateDisplay(); showAchievementOnce("Critical Click Upgrade Purchased!"); } else showAchievement("Not enough clicks!"); };
     shopDiv.appendChild(critBtn);
 
@@ -328,26 +326,43 @@ function renderShop(){
         const prestigeHeader=document.createElement("h3"); prestigeHeader.innerText="Premium Shop"; shopDiv.appendChild(prestigeHeader);
         for(let i=1;i<=8;i++){
             const pBtn=document.createElement("div"); pBtn.className="shop-item"; pBtn.innerText=`Premium Upgrade ${i} (1 PP)`; 
-            pBtn.onclick=()=>{ if(prestigePoints>=1){ clickPower+=i; prestigePoints--; saveData(); updateDisplay(); showAchievementOnce(`Premium Upgrade ${i} Bought!`); } else showAchievement("Not enough Premium Coins!"); };
+            pBtn.onclick=()=>{ 
+                if(prestigePoints>=1){ 
+                    clickPower+=i; prestigePoints--; saveData(); updateDisplay(); showAchievementOnce(`Premium Upgrade ${i} Bought!`); 
+                } else showAchievement("Not enough Premium Coins!"); 
+            };
             shopDiv.appendChild(pBtn);
         }
     }
 }
 
-// === ACHIEVEMENTS CHECK ===
+// Achievements
 function checkAchievements(){
     if(x>=1000) showAchievementOnce("1000 Clicks!");
     if(x>=10000) showAchievementOnce("10,000 Clicks!");
     if(rebirths>=1) showAchievementOnce("First Rebirth!");
 }
 
-// === DAILY TIMER ===
-setInterval(()=>{ const now=Date.now(); const remaining=Math.max(0,24*60*60*1000-(now-lastDaily)); let hrs=Math.floor(remaining/3600000); let mins=Math.floor((remaining%3600000)/60000); let secs=Math.floor((remaining%60000)/1000); document.getElementById("dailyTimer").innerText=`Next daily in: ${String(hrs).padStart(2,'0')}:${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`; },1000);
+// Daily timer
+setInterval(()=>{ 
+    const now=Date.now(); 
+    const remaining=Math.max(0,24*60*60*1000-(now-lastDaily)); 
+    let hrs=Math.floor(remaining/3600000); 
+    let mins=Math.floor((remaining%3600000)/60000); 
+    let secs=Math.floor((remaining%60000)/1000); 
+    document.getElementById("dailyTimer").innerText=`Next daily in: ${String(hrs).padStart(2,'0')}:${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`; 
+},1000);
 
-// === AUTO CLICKER LOOP ===
-setInterval(()=>{ if(autoClickers>0){ x+=autoClickers*rebirthMultiplier; totalClicks+=autoClickers*rebirthMultiplier; saveData(); updateDisplay(); checkAchievements(); } },1000);
+// Auto-clicker
+setInterval(()=>{ 
+    if(autoClickers>0){ 
+        x+=autoClickers*rebirthMultiplier; 
+        totalClicks+=autoClickers*rebirthMultiplier; 
+        saveData(); updateDisplay(); checkAchievements(); 
+    } 
+},1000);
 
-// === SAVE DATA ===
+// Save
 function saveData(){
     localStorage.setItem("x", x);
     localStorage.setItem("clickPower", clickPower);
@@ -363,9 +378,8 @@ function saveData(){
     localStorage.setItem("startTime", startTime);
 }
 
-// === INITIALIZE ===
+// Initialize
 renderShop(); updateDisplay(); checkAchievements();
-
 </script>
 </body>
 </html>
