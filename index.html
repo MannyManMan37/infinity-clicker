@@ -49,14 +49,38 @@
             flex-direction: column;
             gap: 5px;
         }
-        .sidebar button {
-            min-height: 50px;
-            font-size: 1.2rem;
-            border: none;
-            border-radius: 8px;
-            color: white;
-            cursor: pointer;
-        }
+        /* Sidebar buttons */
+    .sidebar button {
+        min-height:50px;
+        font-size:1.2rem;
+        border:none;
+        border-radius:8px;
+        color:white;
+        cursor:pointer;
+        background-color:#6a11cb;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.sidebar button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 10px gold;
+}
+
+/* Modal buttons (Credits, Patch Notes, Quests, Stats) */
+.credits-box button {
+    width: 100%;
+    padding: 10px;
+    border:none;
+    border-radius:8px;
+    background:crimson;
+    color:white;
+    cursor:pointer;
+    box-sizing: border-box;
+    font-size:1rem;
+}
+.credits-box button:hover {
+    background:#ff4c4c;
+}
+
         .shop { 
             flex: 1; 
             padding: 20px; 
@@ -418,3 +442,4 @@ generateDailyQuests();
 </script>
 </body>
 </html>
+
