@@ -19,20 +19,35 @@
         }
         .sidebar {
             width: 280px;
+            min-width: 200px;
             background: rgba(0,0,0,0.85);
             padding: 15px;
             display: flex;
             flex-direction: column;
             gap: 10px;
             border-right: 2px solid gold;
+            height: 100vh;
+            box-sizing: border-box;
         }
-        #idk, #rebirthCounter, #prestigePoints {
-            background: rgba(0,0,0,0.5);
-            border: 2px solid gold;
+        #idk, #rebirthCounter, #prestigePoints { 
+            background: rgba(0,0,0,0.5); 
+            border: 2px solid gold; 
             padding: 12px;
             border-radius: 8px;
             text-align: center;
             font-size: 1.3rem;
+        }
+        .sidebar-buttons {
+            flex: 1 1 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .sidebar-bottom {
+            flex: 0 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
         }
         .sidebar button {
             min-height: 50px;
@@ -42,38 +57,66 @@
             color: white;
             cursor: pointer;
         }
-        .shop {
-            flex: 1;
-            padding: 20px;
+        .shop { 
+            flex: 1; 
+            padding: 20px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 10px; 
+            overflow-y: auto; 
             background: rgba(0,0,0,0.6);
-            overflow-y: auto;
         }
-        .shop-item {
-            background: rgba(0,0,0,0.6);
-            padding: 12px;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-        .credits-box {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%,-50%);
-            background: rgba(0,0,0,0.95);
-            padding: 20px;
-            border-radius: 12px;
-            z-index: 1000;
-            width: 380px;
+        .shop-item { 
+            background: rgba(0,0,0,0.6); 
+            padding:12px; 
+            border-radius:6px; 
+            cursor:pointer; 
         }
         #overlay {
-            display: none;
-            position: fixed;
-            top:0;left:0;
-            width:100%;
-            height:100%;
-            background: rgba(0,0,0,0.7);
-            z-index: 900;
+            display:none;
+            position:fixed;
+            inset:0;
+            background:rgba(0,0,0,0.7);
+            z-index:900;
+        }
+        .credits-box {
+            display:none;
+            position:fixed;
+            top:50%;
+            left:50%;
+            transform:translate(-50%,-50%);
+            background:rgba(0,0,0,0.95);
+            padding:20px;
+            border-radius:12px;
+            border:2px solid white;
+            z-index:1000;
+            width:380px;
+            max-height:70vh;
+            overflow-y:auto;
+        }
+        #achievementPopup {
+            position:fixed;
+            bottom:20px;
+            right:20px;
+            z-index:2000;
+        }
+        .achievement-message {
+            background:gold;
+            color:black;
+            padding:10px;
+            border-radius:8px;
+            margin-top:8px;
+            font-weight:bold;
+        }
+        #avgCPS {
+            position:fixed;
+            top:10px;
+            right:10px;
+            background:rgba(0,0,0,0.7);
+            border:2px solid gold;
+            padding:8px 12px;
+            border-radius:8px;
+            z-index:3000;
         }
     </style>
 </head>
@@ -81,98 +124,140 @@
 
 <div class="sidebar">
     <h1>Infinity Clicker</h1>
-    <p id="idk">Clicks: 0</p>
-    <p id="rebirthCounter">Rebirths: 0</p>
-    <p id="prestigePoints">Premium Coins: 0</p>
 
-    <button onclick="clickHandler()">Click</button>
-    <button onclick="rebirth()">Rebirth</button>
-    <button onclick="showCredits()">Credits</button>
-    <button onclick="showPatch()">Patch Notes</button>
-    <button onclick="showQuests()">Daily Quests</button>
-    <button onclick="showAchievementsMenu()">Achievements</button>
-    <button onclick="showStats()">Stats</button>
+    <div id="statsContainer">
+        <p id="idk">Clicks: 0</p>
+        <p id="rebirthCounter">Rebirths: 0</p>
+        <p id="prestigePoints">Premium Coins: 0</p>
+    </div>
+
+    <div class="sidebar-buttons">
+        <button onclick="clickHandler()">Click</button>
+        <button onclick="rebirth()">Rebirth</button>
+        <button onclick="showCredits()">Credits</button>
+        <button onclick="showPatch()">Patch Notes</button>
+        <button onclick="showQuests()">Daily Quests</button>
+        <button onclick="showAchievementsMenu()">Achievements</button>
+        <button onclick="showStats()">Stats</button>
+    </div>
+
+    <div class="sidebar-bottom">
+        <button onclick="claimDaily()">Daily Reward</button>
+        <div id="dailyTimer">Next daily in: 24:00:00</div>
+    </div>
 </div>
 
-<div class="shop"><h2>Shop</h2></div>
+<div class="shop">
+    <h2>Shop</h2>
+</div>
 
 <div id="overlay" onclick="closeAllModals()"></div>
 
+<!-- CREDITS -->
+<div id="creditsBox" class="credits-box">
+    <h2>Credits</h2>
+    <p><strong>Quantum</strong> — Developer</p>
+    <p><strong>RXL</strong> — Game Tester</p>
+    <button onclick="closeAllModals()">Close</button>
+</div>
+
+<!-- PATCH -->
+<div id="patchBox" class="credits-box">
+    <h2>Patch Notes</h2>
+    <p><strong>October 2025 - 2.00</strong></p>
+    <ul>
+        <li>Daily Quests</li>
+        <li>Offline Progress</li>
+        <li>Average CPS Display</li>
+    </ul>
+    <hr>
+    <strong>October 2025 - 2.00 UPD</strong>
+    <br> - New Premium Shop upgrades
+    <br> - Click Combos / Streaks added
+    <br> - Random Events added
+    <br> - Offline Progress implemented
+    <br> - Quests / Missions added (Under Maintenance)
+    <br> - Achievements Menu added
+    <br> - Statistics Page added
+    <br> - Custom Themes unlocked
+    <br> - Fixed Bugs
+    <button onclick="closeAllModals()">Close</button>
+</div>
+
+<!-- QUESTS -->
 <div id="questsBox" class="credits-box">
     <h2>Daily Quests</h2>
     <div id="questsContent"></div>
     <button onclick="closeAllModals()">Close</button>
 </div>
 
-<div id="achievementPopup"></div>
-
-<!-- AVG CPS -->
-<div id="avgCPS" style="position:fixed;top:10px;right:10px;
-background:rgba(0,0,0,0.7);
-border:2px solid gold;
-padding:8px 12px;
-border-radius:8px;">
-Avg CPS: 0.00
+<!-- STATS -->
+<div id="statsBox" class="credits-box">
+    <h2>Statistics</h2>
+    <div id="statsContent"></div>
+    <button onclick="closeAllModals()">Close</button>
 </div>
 
+<div id="achievementPopup"></div>
+
+<div id="avgCPS">Avg CPS: 0.00</div>
+
 <script>
-let x = parseInt(localStorage.getItem("x")) || 0;
-let clickPower = parseInt(localStorage.getItem("clickPower")) || 1;
-let rebirths = parseInt(localStorage.getItem("rebirths")) || 0;
-let rebirthMultiplier = parseInt(localStorage.getItem("rebirthMultiplier")) || 1;
-let autoClickers = parseInt(localStorage.getItem("autoClickers")) || 0;
-let critChance = parseFloat(localStorage.getItem("critChance")) || 0;
-let prestigePoints = parseInt(localStorage.getItem("prestigePoints")) || 0;
-let totalClicks = parseInt(localStorage.getItem("totalClicks")) || 0;
-let critsTriggered = parseInt(localStorage.getItem("critsTriggered")) || 0;
-let startTime = parseInt(localStorage.getItem("startTime")) || Date.now();
-let lastOnline = parseInt(localStorage.getItem("lastOnline")) || Date.now();
+/* ================= CORE VARIABLES ================= */
+let x = +localStorage.getItem("x") || 0;
+let clickPower = +localStorage.getItem("clickPower") || 1;
+let rebirths = +localStorage.getItem("rebirths") || 0;
+let rebirthMultiplier = +localStorage.getItem("rebirthMultiplier") || 1;
+let autoClickers = +localStorage.getItem("autoClickers") || 0;
+let critChance = +localStorage.getItem("critChance") || 0;
+let prestigePoints = +localStorage.getItem("prestigePoints") || 0;
+let lastDaily = +localStorage.getItem("lastDaily") || 0;
+let totalClicks = +localStorage.getItem("totalClicks") || 0;
+let critsTriggered = +localStorage.getItem("critsTriggered") || 0;
+let startTime = +localStorage.getItem("startTime") || Date.now();
+let lastOnline = +localStorage.getItem("lastOnline") || Date.now();
 
-/* AVG CPS */
-function updateAvgCPS(){
-    const seconds = Math.max(1, Math.floor((Date.now()-startTime)/1000));
-    document.getElementById("avgCPS").innerText =
-        `Avg CPS: ${(totalClicks/seconds).toFixed(2)}`;
-}
-
-/* OFFLINE PROGRESS */
+/* =============== OFFLINE PROGRESS =============== */
 (function(){
     const now = Date.now();
-    const secs = Math.floor((now-lastOnline)/1000);
-    if(secs>10){
-        const gain = secs*(autoClickers+1)*rebirthMultiplier;
-        x+=gain; totalClicks+=gain;
+    const seconds = Math.floor((now - lastOnline)/1000);
+    if(seconds > 10){
+        const gain = seconds*(autoClickers+1)*rebirthMultiplier;
+        x += gain;
+        totalClicks += gain;
     }
-    localStorage.setItem("lastOnline",now);
+    localStorage.setItem("lastOnline", now);
 })();
 
-/* QUEST SYSTEM */
+/* =============== AVG CPS =============== */
+function updateAvgCPS(){
+    const seconds = Math.max(1, Math.floor((Date.now()-startTime)/1000));
+    avgCPS.innerText = `Avg CPS: ${(totalClicks/seconds).toFixed(2)}`;
+}
+
+/* =============== DAILY QUESTS =============== */
 let dailyQuests = JSON.parse(localStorage.getItem("dailyQuests")) || [];
 let dailyQuestsClaimed = JSON.parse(localStorage.getItem("dailyQuestsClaimed")) || [false,false,false];
 let lastQuestDay = localStorage.getItem("lastQuestDay") || "";
 
-const questPool=[];
-for(let i=1;i<=50;i++){
-    questPool.push({
-        description:`Earn ${i*1000} clicks`,
-        goal:i*1000
-    });
-}
+const questPool = Array.from({length:50},(_,i)=>({
+    description:`Earn ${(i+1)*1000} clicks`,
+    goal:(i+1)*1000
+}));
 
 function generateDailyQuests(){
-    const today=new Date().toDateString();
-    if(today!==lastQuestDay){
+    const today = new Date().toDateString();
+    if(today !== lastQuestDay){
         dailyQuests=[];
         dailyQuestsClaimed=[false,false,false];
-        const shuffled=[...questPool].sort(()=>0.5-Math.random());
+        const shuffled = [...questPool].sort(()=>0.5-Math.random());
         for(let i=0;i<3;i++){
-            const q=JSON.parse(JSON.stringify(shuffled[i]));
-            q.progress=0;
-            q.rewardClicks=Math.floor(q.goal*(1+rebirths*0.5));
-            q.rewardPP=Math.floor(1+rebirths/2);
+            const q = {...shuffled[i], progress:0};
+            q.rewardClicks = Math.floor(q.goal*(1+rebirths*0.5));
+            q.rewardPP = Math.floor(1+rebirths/2);
             dailyQuests.push(q);
         }
-        lastQuestDay=today;
+        lastQuestDay = today;
         saveData();
     }
 }
@@ -183,12 +268,12 @@ function showQuests(){
     questsBox.style.display="block";
     questsContent.innerHTML="";
     dailyQuests.forEach((q,i)=>{
-        questsContent.innerHTML+=`
-        <p><b>${q.description}</b></p>
+        questsContent.innerHTML += `
+        <p><strong>${q.description}</strong></p>
         <p>${Math.floor(q.progress)} / ${q.goal}</p>
-        <p>Reward: ${q.rewardClicks} clicks + ${q.rewardPP} PP</p>
+        <p>Reward: +${q.rewardClicks} clicks, +${q.rewardPP} PP</p>
         <button onclick="claimQuest(${i})" ${dailyQuestsClaimed[i]?"disabled":""}>
-        ${dailyQuestsClaimed[i]?"Claimed":"Claim"}
+            ${dailyQuestsClaimed[i]?"Claimed":"Claim"}
         </button><hr>`;
     });
 }
@@ -203,26 +288,111 @@ function claimQuest(i){
     }
 }
 
-/* CLICK */
+/* =============== CLICK HANDLER =============== */
 function clickHandler(){
-    let gain=clickPower*rebirthMultiplier;
-    if(Math.random()<critChance){gain*=3;critsTriggered++;}
-    x+=gain; totalClicks+=gain;
-    dailyQuests.forEach(q=>q.progress+=gain);
-    saveData(); updateDisplay();
+    let gain = clickPower*rebirthMultiplier;
+    if(Math.random() < critChance) gain*=3, critsTriggered++;
+    x += gain;
+    totalClicks += gain;
+    dailyQuests.forEach(q => q.progress += gain);
+    saveData();
+    updateDisplay();
 }
 
-/* REBIRTH */
+/* =============== REBIRTH =============== */
 function rebirth(){
     if(x>=1000){
-        rebirths++; prestigePoints++;
-        rebirthMultiplier=1+Math.floor(rebirths*0.5);
+        rebirths++;
+        prestigePoints++;
+        rebirthMultiplier = 1 + Math.floor(rebirths*0.5);
         x=0; clickPower=1; autoClickers=0; critChance=0;
-        saveData(); updateDisplay();
+        saveData();
+        updateDisplay();
+        renderShop(); // update premium shop
     }
 }
 
-/* SAVE */
+/* =============== DAILY REWARD =============== */
+function claimDaily(){
+    const now=Date.now();
+    if(now-lastDaily>=86400000){
+        const reward=500+rebirths*100;
+        x+=reward;
+        lastDaily=now;
+        saveData();
+        updateDisplay();
+    }
+}
+
+/* =============== MODALS =============== */
+function showCredits(){overlay.style.display="block";creditsBox.style.display="block";}
+function showPatch(){overlay.style.display="block";patchBox.style.display="block";}
+function showStats(){
+    overlay.style.display="block";
+    statsBox.style.display="block";
+    statsContent.innerHTML=`Total Clicks: ${totalClicks}<br>Rebirths: ${rebirths}<br>Crits: ${critsTriggered}<br>Premium Coins: ${prestigePoints}`;
+}
+function closeAllModals(){
+    overlay.style.display="none";
+    document.querySelectorAll(".credits-box").forEach(b=>b.style.display="none");
+}
+
+/* =============== SHOP ================= */
+const buttonPowers=[1,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100,110,120,130,140,150,160,170,180,190,200,220,240,260,280,300,320,340,360,380,400,450,500,550,600,650,700,750,800,850];
+const shopDiv=document.querySelector(".shop");
+
+function renderShop(){
+    shopDiv.innerHTML="<h2>Shop</h2>";
+    buttonPowers.forEach((power,index)=>{
+        const btn=document.createElement("div");
+        btn.className="shop-item";
+        let cost = Math.floor(power*10);
+        btn.innerText=`Button ${index+1}: +${power} per click (Cost: ${cost})`;
+        btn.onclick=()=>{
+            if(x>=cost){
+                x-=cost;
+                clickPower+=power;
+                saveData(); updateDisplay();
+            }
+        };
+        shopDiv.appendChild(btn);
+    });
+
+    if(rebirths>0){
+        const prestigeHeader=document.createElement("h3");
+        prestigeHeader.innerText="Premium Shop";
+        shopDiv.appendChild(prestigeHeader);
+
+        const premiumUpgrades=[
+            {name:"+1 Click Power",type:"clickPower",value:1},
+            {name:"+5 Click Power",type:"clickPower",value:5},
+            {name:"Auto Clicker +1",type:"autoClicker",value:1},
+            {name:"Auto Clicker +2",type:"autoClicker",value:2},
+            {name:"+1% Critical Chance",type:"crit",value:0.01},
+            {name:"+5% Critical Chance",type:"crit",value:0.05},
+            {name:"+10 Click Power",type:"clickPower",value:10},
+            {name:"Auto Clicker +5",type:"autoClicker",value:5}
+        ];
+
+        premiumUpgrades.forEach(upgrade=>{
+            const pBtn=document.createElement("div");
+            pBtn.className="shop-item";
+            pBtn.innerText=`${upgrade.name} (Cost: 1 PP)`;
+            pBtn.onclick=()=>{
+                if(prestigePoints>=1){
+                    prestigePoints--;
+                    if(upgrade.type==="clickPower") clickPower+=upgrade.value;
+                    if(upgrade.type==="autoClicker") autoClickers+=upgrade.value;
+                    if(upgrade.type==="crit"){ critChance+=upgrade.value; if(critChance>1) critChance=1; }
+                    saveData(); updateDisplay();
+                }
+            };
+            shopDiv.appendChild(pBtn);
+        });
+    }
+}
+
+/* =============== SAVE ================= */
 function saveData(){
     localStorage.setItem("x",x);
     localStorage.setItem("clickPower",clickPower);
@@ -231,23 +401,20 @@ function saveData(){
     localStorage.setItem("autoClickers",autoClickers);
     localStorage.setItem("critChance",critChance);
     localStorage.setItem("prestigePoints",prestigePoints);
+    localStorage.setItem("lastDaily",lastDaily);
     localStorage.setItem("totalClicks",totalClicks);
     localStorage.setItem("critsTriggered",critsTriggered);
     localStorage.setItem("startTime",startTime);
+    localStorage.setItem("lastOnline",lastOnline);
     localStorage.setItem("dailyQuests",JSON.stringify(dailyQuests));
     localStorage.setItem("dailyQuestsClaimed",JSON.stringify(dailyQuestsClaimed));
     localStorage.setItem("lastQuestDay",lastQuestDay);
 }
 
-/* DISPLAY */
-function updateDisplay(){
-    idk.innerText="Clicks: "+x;
-    rebirthCounter.innerText="Rebirths: "+rebirths;
-    prestigePoints.innerText="Premium Coins: "+prestigePoints;
-    updateAvgCPS();
-}
-
+/* =============== INITIALIZE ================= */
+renderShop();
 updateDisplay();
+generateDailyQuests();
 </script>
 </body>
 </html>
