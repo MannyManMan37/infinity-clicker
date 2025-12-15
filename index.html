@@ -60,7 +60,6 @@
             transition: transform 0.2s, box-shadow 0.2s;
         }
         .sidebar button:hover { transform: scale(1.05); box-shadow: 0 0 10px gold; }
-
         .credits-box button {
             width: 100%;
             padding: 10px;
@@ -73,7 +72,6 @@
             box-sizing: border-box;
         }
         .credits-box button:hover { background:#ff4c4c; }
-
         .shop { 
             flex: 1; 
             padding: 20px; 
@@ -84,13 +82,10 @@
             background: rgba(0,0,0,0.6);
         }
         .shop-item { background: rgba(0,0,0,0.6); padding:12px; border-radius:6px; cursor:pointer; }
-
         #overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:900; }
         .credits-box { display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:rgba(0,0,0,0.95); padding:20px; border-radius:12px; border:2px solid white; z-index:1000; width:380px; max-height:70vh; overflow-y:auto; }
-
         #achievementPopup { position:fixed; bottom:20px; right:20px; z-index:2000; }
         .achievement-message { background:gold; color:black; padding:10px; border-radius:8px; margin-top:8px; font-weight:bold; }
-
         #avgCPS { position:fixed; top:10px; right:10px; background:rgba(0,0,0,0.7); border:2px solid gold; padding:8px 12px; border-radius:8px; z-index:3000; }
     </style>
 </head>
@@ -98,13 +93,11 @@
 
 <div class="sidebar">
     <h1>Infinity Clicker</h1>
-
     <div id="statsContainer">
         <p id="idk">Clicks: 0</p>
         <p id="rebirthCounter">Rebirths: 0</p>
         <p id="prestigePoints">Premium Coins: 0</p>
     </div>
-
     <div class="sidebar-buttons">
         <button onclick="clickHandler()">Click</button>
         <button onclick="rebirth()">Rebirth</button>
@@ -114,20 +107,15 @@
         <button onclick="showAchievementsMenu()">Achievements</button>
         <button onclick="showStats()">Stats</button>
     </div>
-
     <div class="sidebar-bottom">
         <button onclick="claimDaily()">Daily Reward</button>
         <div id="dailyTimer">Next daily in: 24:00:00</div>
     </div>
 </div>
 
-<div class="shop">
-    <h2>Shop</h2>
-</div>
-
+<div class="shop"><h2>Shop</h2></div>
 <div id="overlay" onclick="closeAllModals()"></div>
 
-<!-- CREDITS -->
 <div id="creditsBox" class="credits-box">
     <h2>Credits</h2>
     <p><strong>Quantum</strong> — Developer</p>
@@ -135,7 +123,6 @@
     <button onclick="closeAllModals()">Close</button>
 </div>
 
-<!-- PATCH -->
 <div id="patchBox" class="credits-box">
     <h2>Patch Notes</h2>
     <p><strong>October 2025 - 2.00</strong></p>
@@ -158,14 +145,12 @@
     <button onclick="closeAllModals()">Close</button>
 </div>
 
-<!-- QUESTS -->
 <div id="questsBox" class="credits-box">
     <h2>Daily Quests</h2>
     <div id="questsContent"></div>
     <button onclick="closeAllModals()">Close</button>
 </div>
 
-<!-- STATS -->
 <div id="statsBox" class="credits-box">
     <h2>Statistics</h2>
     <div id="statsContent"></div>
@@ -176,7 +161,7 @@
 <div id="avgCPS">Avg CPS: 0.00</div>
 
 <script>
-/* ========== ELEMENT REFERENCES ========== */
+/* ===== ELEMENTS ===== */
 const overlay = document.getElementById("overlay");
 const questsBox = document.getElementById("questsBox");
 const questsContent = document.getElementById("questsContent");
@@ -188,7 +173,7 @@ const creditsBox = document.getElementById("creditsBox");
 const patchBox = document.getElementById("patchBox");
 const shopDiv = document.querySelector(".shop");
 
-/* ========== GAME VARIABLES ========== */
+/* ===== VARIABLES ===== */
 let x = +localStorage.getItem("x") || 0;
 let clickPower = +localStorage.getItem("clickPower") || 1;
 let rebirths = +localStorage.getItem("rebirths") || 0;
@@ -202,48 +187,50 @@ let critsTriggered = +localStorage.getItem("critsTriggered") || 0;
 let startTime = +localStorage.getItem("startTime") || Date.now();
 let lastOnline = +localStorage.getItem("lastOnline") || Date.now();
 
-/* ========== DISPLAY UPDATE ========== */
+/* ===== DISPLAY ===== */
 function updateDisplay(){
     document.getElementById("idk").innerText = "Clicks: " + Math.floor(x);
     document.getElementById("rebirthCounter").innerText = "Rebirths: " + rebirths;
     document.getElementById("prestigePoints").innerText = "Premium Coins: " + prestigePoints;
+    updateAvgCPS();
 }
 
-/* ========== SHOP ========== */
-const buttonPowers = [1,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100];
+/* ===== AVG CPS ===== */
+function updateAvgCPS(){
+    const seconds = Math.max(1, Math.floor((Date.now()-startTime)/1000));
+    avgCPS.innerText = `Avg CPS: ${(totalClicks/seconds).toFixed(2)}`;
+}
+
+/* ===== SHOP ===== */
+const buttonPowers = [1,5,10,15,20,25,30,35,40,45,50];
 function renderShop(){
-    shopDiv.innerHTML = "<h2>Shop</h2>";
+    shopDiv.innerHTML="<h2>Shop</h2>";
     buttonPowers.forEach((power,index)=>{
         const btn = document.createElement("div");
-        btn.className = "shop-item";
-        let cost = power*10;
-        btn.innerText = `Button ${index+1}: +${power} per click (Cost: ${cost})`;
-        btn.onclick = ()=>{
-            if(x>=cost){ x-=cost; clickPower+=power; saveData(); updateDisplay(); }
-        };
+        btn.className="shop-item";
+        const cost = power*10;
+        btn.innerText=`Button ${index+1}: +${power} per click (Cost: ${cost})`;
+        btn.onclick=()=>{ if(x>=cost){ x-=cost; clickPower+=power; saveData(); updateDisplay(); } };
         shopDiv.appendChild(btn);
     });
-
     if(rebirths>0){
-        const prestigeHeader = document.createElement("h3");
-        prestigeHeader.innerText = "Premium Shop";
-        shopDiv.appendChild(prestigeHeader);
-
-        const premiumUpgrades = [
+        const premiumHeader = document.createElement("h3");
+        premiumHeader.innerText="Premium Shop";
+        shopDiv.appendChild(premiumHeader);
+        const premiumUpgrades=[
             {name:"+1 Click Power", type:"clickPower", value:1},
             {name:"+5 Click Power", type:"clickPower", value:5},
             {name:"Auto Clicker +1", type:"autoClicker", value:1},
             {name:"Auto Clicker +2", type:"autoClicker", value:2},
             {name:"+1% Critical Chance", type:"crit", value:0.01},
         ];
-
         premiumUpgrades.forEach(upg=>{
-            const btn = document.createElement("div");
+            const btn=document.createElement("div");
             btn.className="shop-item";
-            btn.innerText=`${upg.name} (Cost: 1 PP)`;
-            btn.onclick = ()=>{
+            btn.innerText=`${upg.name} (Cost:1 PP)`;
+            btn.onclick=()=>{
                 if(prestigePoints>=1){
-                    prestigePoints--;
+                    prestigePoints--; 
                     if(upg.type==="clickPower") clickPower+=upg.value;
                     if(upg.type==="autoClicker") autoClickers+=upg.value;
                     if(upg.type==="crit"){ critChance+=upg.value; if(critChance>1) critChance=1; }
@@ -255,38 +242,74 @@ function renderShop(){
     }
 }
 
-/* ========== CLICK HANDLER ========== */
+/* ===== CLICK ===== */
 function clickHandler(){
     let gain = clickPower*rebirthMultiplier;
-    x += gain; totalClicks += gain;
-    updateDisplay(); saveData();
+    if(Math.random()<critChance) gain*=3, critsTriggered++;
+    x+=gain; totalClicks+=gain;
+    dailyQuests.forEach(q=>q.progress+=gain);
+    saveData(); updateDisplay();
 }
 
-/* ========== DAILY QUESTS ========== */
+/* ===== REBIRTH ===== */
+function rebirth(){
+    if(x>=1000){
+        rebirths++; prestigePoints++;
+        rebirthMultiplier = 1 + Math.floor(rebirths*0.5);
+        x=0; clickPower=1; autoClickers=0; critChance=0;
+        renderShop(); updateDisplay(); saveData();
+        showNotification("Rebirth complete! +1 PP");
+    }
+}
+
+/* ===== DAILY REWARD ===== */
+function claimDaily(){
+    const now=Date.now();
+    if(now-lastDaily>=86400000){
+        let reward=500 + rebirths*100;
+        x+=reward; lastDaily=now;
+        saveData(); updateDisplay();
+        showNotification(`Daily claimed: +${reward} clicks`);
+    } else showNotification("Daily not ready!");
+}
+function updateDailyTimer(){
+    const now = Date.now();
+    let remain = Math.max(0, 86400000-(now-lastDaily));
+    let h=Math.floor(remain/3600000), m=Math.floor((remain%3600000)/60000), s=Math.floor((remain%60000)/1000);
+    document.getElementById("dailyTimer").innerText=`Next daily in: ${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+}
+setInterval(updateDailyTimer,1000);
+
+/* ===== NOTIFICATIONS ===== */
+function showNotification(msg){
+    const popup=document.createElement("div");
+    popup.className="achievement-message"; popup.innerText=msg;
+    achievementPopup.appendChild(popup);
+    setTimeout(()=>popup.remove(),3000);
+}
+
+/* ===== DAILY QUESTS ===== */
 let dailyQuests = JSON.parse(localStorage.getItem("dailyQuests"))||[];
 let dailyQuestsClaimed = JSON.parse(localStorage.getItem("dailyQuestsClaimed"))||[false,false,false];
 let lastQuestDay = localStorage.getItem("lastQuestDay")||"";
-
 const questPool = Array.from({length:50},(_,i)=>({description:`Earn ${(i+1)*1000} clicks`, goal:(i+1)*1000}));
 
 function generateDailyQuests(){
     const today = new Date().toDateString();
     if(today!==lastQuestDay){
-        dailyQuests = []; dailyQuestsClaimed=[false,false,false];
+        dailyQuests=[]; dailyQuestsClaimed=[false,false,false];
         const shuffled = [...questPool].sort(()=>0.5-Math.random());
         for(let i=0;i<3;i++){
-            const q = {...shuffled[i], progress:0};
+            const q={...shuffled[i], progress:0};
             q.rewardClicks = Math.floor(q.goal*(1+rebirths*0.5));
             q.rewardPP = Math.floor(1+rebirths/2);
             dailyQuests.push(q);
         }
-        lastQuestDay = today; saveData();
+        lastQuestDay=today; saveData();
     }
 }
-
 function showQuests(){
-    generateDailyQuests();
-    overlay.style.display="block"; questsBox.style.display="block";
+    generateDailyQuests(); overlay.style.display="block"; questsBox.style.display="block";
     questsContent.innerHTML="";
     dailyQuests.forEach((q,i)=>{
         questsContent.innerHTML += `<p><strong>${q.description}</strong></p>
@@ -295,17 +318,24 @@ function showQuests(){
         <button onclick="claimQuest(${i})" ${dailyQuestsClaimed[i]?'disabled':''}>${dailyQuestsClaimed[i]?'Claimed':'Claim'}</button><hr>`;
     });
 }
-
 function claimQuest(i){
     const q=dailyQuests[i];
     if(q.progress>=q.goal && !dailyQuestsClaimed[i]){
         x+=q.rewardClicks; prestigePoints+=q.rewardPP;
-        dailyQuestsClaimed[i]=true; saveData(); updateDisplay();
+        dailyQuestsClaimed[i]=true; saveData(); updateDisplay(); showNotification("Quest completed!");
         showQuests();
     }
 }
 
-/* ========== SAVE ================= */
+/* ===== MODALS ===== */
+function showCredits(){overlay.style.display="block"; creditsBox.style.display="block";}
+function showPatch(){overlay.style.display="block"; patchBox.style.display="block";}
+function showStats(){overlay.style.display="block"; statsBox.style.display="block";
+    statsContent.innerHTML=`Total Clicks: ${totalClicks}<br>Rebirths: ${rebirths}<br>Crits: ${critsTriggered}<br>Premium Coins: ${prestigePoints}`;}
+function closeAllModals(){overlay.style.display="none"; document.querySelectorAll(".credits-box").forEach(b=>b.style.display="none");}
+function showAchievementsMenu(){showNotification("Achievements not implemented yet!");}
+
+/* ===== SAVE ===== */
 function saveData(){
     localStorage.setItem("x",x);
     localStorage.setItem("clickPower",clickPower);
@@ -314,17 +344,27 @@ function saveData(){
     localStorage.setItem("autoClickers",autoClickers);
     localStorage.setItem("critChance",critChance);
     localStorage.setItem("prestigePoints",prestigePoints);
+    localStorage.setItem("lastDaily",lastDaily);
+    localStorage.setItem("totalClicks",totalClicks);
+    localStorage.setItem("critsTriggered",critsTriggered);
+    localStorage.setItem("startTime",startTime);
+    localStorage.setItem("lastOnline",lastOnline);
     localStorage.setItem("dailyQuests",JSON.stringify(dailyQuests));
     localStorage.setItem("dailyQuestsClaimed",JSON.stringify(dailyQuestsClaimed));
     localStorage.setItem("lastQuestDay",lastQuestDay);
 }
 
-/* ========== INIT ================= */
-renderShop();
-updateDisplay();
-generateDailyQuests();
+/* ===== OFFLINE PROGRESS ===== */
+(function(){
+    const now = Date.now();
+    const seconds = Math.floor((now-lastOnline)/1000);
+    if(seconds>10){ const gain = seconds*(autoClickers+1)*rebirthMultiplier; x+=gain; totalClicks+=gain; }
+    lastOnline=now; saveData();
+})();
+
+/* ===== INIT ===== */
+renderShop(); updateDisplay(); generateDailyQuests();
 </script>
 
 </body>
 </html>
-
