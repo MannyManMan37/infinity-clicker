@@ -1,2 +1,2 @@
-# Void-clicker
+# Void-Clicker
 My Clicking Game
